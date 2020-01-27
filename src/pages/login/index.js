@@ -1,8 +1,18 @@
 import React, { Component } from 'react';
-import { Form, Icon, Input, Button } from 'antd';
-import logo from './assets/logo.png'
+import { Redirect } from 'react-router-dom';
+import { Form, Icon, Input, Button, message } from 'antd';
+import logo from '../../assets/images/logo.png';
+import { reqLogin } from '../../api';
+import memoryUtils from '../../utils/memoryUtils';
+import storageUtils from '../../utils/storageUtils';
 import './login.less';
 
+/**
+ * 维持登录与自动登录
+ * 1. 登录后，刷新后仍是已登录状态
+ * 2. 登录后，关闭浏览器再打开依然是已登录转台
+ * 3. 登录后，访问登录路径会自动跳转到管理界面
+ */
 const Item = Form.Item;
 /**
  * Login page
@@ -12,10 +22,29 @@ class Login extends Component {
         //阻止事件的默认行为
         e.preventDefault();
         //对所有表单字段进行校验
-        this.props.form.validateFields((err, values) => {
+        this.props.form.validateFields(async (err, values) => {
             if (!err){
-                console.log('received values of form: ' + values);
-            }
+                const { username, password } = values;
+                //const result = await reqLogin(username, password);
+                //{status: 0, data: user}, {status:0, msg: 'xxx'}
+                const result = { status: 0, user: {username: 'admin', _id:'123'}};
+                if (result.status ===  0){
+                    //登录成功
+                    message.success('登录成功');
+                    const user = result.user;
+                    memoryUtils.user = user; //保存到内存
+                    storageUtils.saveUer(user); //保存到Local
+                    //跳转到管理界面
+                    //不需要回退回登录界面，回退用replace，push
+                    this.props.history.replace('/');
+                } else {
+                    //登录失败
+                    message.error(result.msg);
+                }
+                console.log("请求成功");
+            } else {
+                console.log('error');
+;            }
         });
     }
     validatePwd = (rule, value, callback) => {
@@ -33,6 +62,11 @@ class Login extends Component {
         }
     }
     render() {
+        //如果用户已经登录，自动跳转到管理界面
+        const user = memoryUtils.user;
+        if (user && user._id){
+            return <Redirect to='/' />
+        }
         //具有强大功能的form对象
         const form = this.props.form
         const { getFieldDecorator } = form;
