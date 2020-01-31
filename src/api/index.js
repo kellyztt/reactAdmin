@@ -23,7 +23,30 @@ import { message } from 'antd';
 
  //更新分类名称
  export const reqUpdateCategory = (categoryId, categoryName) => ajax(BASE + '/manage/category/update', {categoryId, categoryName}, 'POST');
+
+ //获取商品分页列表
+ export const reqProducts = (pageNum, pageSize) => ajax(BASE + 'manage/product/list', {pageNum, pageSize})
+
+ /**
+  * 搜索商品分页列表
+  * @param {*} pageNum 
+  * @param {*} pageSize 
+  * @param {*} searchName 传入的搜索对象
+  * @param {*} searchType 搜索的类型，productName/productDesc
+  */
+ export const reqSearchProducts = ({pageNum, pageSize, searchName, searchType}) => ajax(BASE + '/manage/product/search', 
+ {pageNum, pageSize,[searchType]:searchName});     //变量值做属性名时，要[]
  
+ /**
+  * 
+  * @param {*} categoryId 根据id获取category 
+  */
+ export const reqCategory = (categoryId) => ajax(BASE + '/manage/category/info', {categoryId});
+
+ /**
+  * 更新商品的状态（上架/下架）
+  */
+ export const reqUpdateStatus = (productId, status) => ajax(BASE + '/manage/product/updateStatus', {productId, status}, 'POST')
  /**
   * jsonp请求的接口请求函数
   */
