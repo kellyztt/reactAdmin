@@ -10,7 +10,7 @@
 import axios from 'axios';
 import { message } from 'antd';
 //只暴露一个的时候用default
-//指定一个默认值,防止undefined
+//指定一个默认值,防止undefined,形参默认值
 export default function ajax(url, data={}, type='GET'){
     return new Promise((resolve, reject) => {    //executor
         //1. 执行异步ajax请求

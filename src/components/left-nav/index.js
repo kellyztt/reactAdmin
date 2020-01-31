@@ -1,14 +1,72 @@
 import React, { Component, Fragment } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import logo from '../../assets/images/logo.png';
 import { Menu, Icon } from 'antd';
+import menuList from '../../config/manuConfig';
 import './index.less';
 
 const { SubMenu } = Menu;
-export default class LeftNav extends Component{
+class LeftNav extends Component{
+    /**
+     * 根据menu的数据数组生成对应标签数组
+     * map+递归调用
+     */
+    getMenuNodes_map = (menuList) => {
+        return menuList.map(item => {
+            if (!item.children){
+                return (
+                    <Menu.Item key={item.key}><Link to={item.key}><Icon type={item.icon} /><span>{item.title}</span></Link></Menu.Item>
+                );
+            } else {
+                return (
+                <SubMenu key={item.key} title={
+                    <span><Icon type={item.icon} /><span>{item.title}</span></span>
+                }>
+                    {this.getMenuNodes(item.children)}
+                </SubMenu>)
+            }
+        })
+    }
+/**
+     * 根据menu的数据数组生成对应标签数组
+     * reduce+递归调用
+     * reduce()做累加
+     */
+    getMenuNodes = (menuList) => {
+        //reduce((上次统计结果，),初始值)
+        const path = this.props.location.pathname;
+        return menuList.reduce((pre, item) => {
+            //向pre中添加<Menu.Item>
+            if (!item.children){
+                pre.push((<Menu.Item key={item.key}><Link to={item.key}><Icon type={item.icon} /><span>{item.title}</span></Link></Menu.Item>));
+            } else {
+                //如果某个item的子item是当前选中的item
+                const cItem = item.children.find(cItem => cItem.key === path);
+                if (cItem){
+                    this.openKey = item.key;
+                }
+                pre.push((<SubMenu key={item.key} title={
+                    <span><Icon type={item.icon} /><span>{item.title}</span></span>
+                }>
+                    {this.getMenuNodes(item.children)}
+                </SubMenu>));
+            };
+            return pre; //当前统计结果，下一次统计的传入
+        },[]);
+    }
+    //在第一次render前执行一次，为第一次render()准备(同步)，
+    //得到所有的nodes，给openKey赋值
+    componentWillMount(){
+        this.menuNodes = this.getMenuNodes(menuList);
+    }
     render(){
+        
+        //得到当前请求的路由路径
+        //这个不是路由组件，没有props.location
+        const path = this.props.location.pathname;
+        const openKey = this.openKey;
         return (
-            <Fragment className="left-nav">
+            <div className="left-nav">
                 <Link to='/' className="left-nav-header">
                     <img src={ logo } alt="logo" />
                     <h1>硅谷后台</h1>
@@ -16,20 +74,19 @@ export default class LeftNav extends Component{
                 <Menu
                     mode="inline"
                     theme="dark"
+                    selectedKeys={[path]}
+                    defaultOpenKeys={[openKey]}
                 >
-                    <Menu.Item key="1"><Icon type="home" /><span>首页</span></Menu.Item>
-                    <SubMenu
-                        key="sub1"
-                        title={
-                        <span><Icon type="mail" /><span>商品</span></span>
-                    }>
-                        <Menu.Item key="2">品类管理</Menu.Item>
-                        <Menu.Item key="3">商品管理</Menu.Item>
-                       
-                    </SubMenu>
+                    {this.menuNodes}
                 </Menu>
-            </Fragment>
+            </div>
             
         )
     }
 }
+/**
+ * withRouter高阶组件:
+ * 包装非路由组件，返回一个新的组件，新的组件向非路由组件传递三个属性：
+ * history,location,match
+ */
+export default withRouter(LeftNav);
