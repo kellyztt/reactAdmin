@@ -20,6 +20,16 @@ const menuList = [
                 key: '/products',
             },
         ]
-    }
+    },
+    {
+        title: '用户管理',
+        icon: 'home',
+        key: '/user',
+    },
+    {
+        title: '角色管理',
+        icon: 'home',
+        key: '/role',
+    },
 ];
 export default menuList;

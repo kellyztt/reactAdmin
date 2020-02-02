@@ -49,6 +49,11 @@ import { message } from 'antd';
  export const reqUpdateStatus = (productId, status) => ajax(BASE + '/manage/product/updateStatus', {productId, status}, 'POST')
 
  export const reqDeleteImg = (name) => ajax(BASE + '/manage/img/delete', {name}, 'POST');
+
+ //添加或更新商品
+ export const reqAddOrUpdateProduct = (product) => ajax(BASE + '/manage/product/' + product._id ? 'update' : 'add', product, 'POST');
+
+
  /**
   * jsonp请求的接口请求函数
   */

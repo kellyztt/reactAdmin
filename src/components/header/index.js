@@ -39,7 +39,7 @@ class Header extends Component{
             if (item.key === path){ //若item的key是当前路径，则title就是所需的title
                 title = item.title;
             } else if (item.children){
-                const cItem = item.children.find(cItem => cItem.key === path) //find回调函数返回值为boolean
+                const cItem = item.children.find(cItem => path.indexOf(cItem.key) === 0) //find回调函数返回值为boolean
                 if (cItem){
                     title = cItem.title;
                 }

@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { Card, Form, Icon, Input, Cascader, Upload, Button } from 'antd';
 import LinkButton from '../../components/link-button';
-import { reqCategorys } from '../../api';
+import { reqCategorys, reqAddOrUpdateProduct } from '../../api';
 import PicturesWall from './pictures-wall';
+import RichTextEditor from './richTextEditor';
 
 const Item = Form.Item;
 const { TextArea } = Input;
@@ -29,15 +30,37 @@ class ProductAddUpdate extends Component{
     constructor (props){
         super(props)
         //创建保存refs标识的标签对象的容器
-        this.pw = React.createRef()
+        this.pw = React.createRef();
+        this.editor = React.createRef();
     }
 
     submit = () => {
         //进行表单验证，通过了才发送请求
-        this.props.form.validateFields((err, values) => {
+        this.props.form.validateFields(async (err, values) => {
+            //1. 收集数据,并封装为product对象
+            const {name, desc, price, categoryIds } = values;
+            let pCategoryId, categoryId;
+            if (categoryIds.length === 1){
+                pCategoryId = '0';
+                categoryId = categoryIds[0];
+            } else {
+                pCategoryId = categoryIds[0];
+                categoryId = categoryIds[1];
+            }
+            const imgs = this.pw.current.getImageNames();
+            const detail = this.editor.current.getDetail();
+            const product = {name, desc, price, imgs, detail}
+            //2. 调用接口请求函数去添加/更新
+            //如果是更新，需要添加_id
+            if(this.isUpdate){
+                product._id = this.product._id;
+                
+            }
+            const result = await reqAddOrUpdateProduct(product)
+            //3. 更新提示
             if (!err){
                 console.log('发送ajax请求');
-                const imgs = this.pw.current.getImageNames();
+                
             }
         })
     }
@@ -158,7 +181,7 @@ class ProductAddUpdate extends Component{
 
     render(){
         const { isUpdate, product } = this;
-        const { pCategoryId, categoryId, imgs } = product;
+        const { pCategoryId, categoryId, imgs, detail } = product;
         const { getFieldDecorator } = this.props.form;
         const categoryIds = [];
         if (isUpdate){
@@ -233,8 +256,8 @@ class ProductAddUpdate extends Component{
                     <Item label='商品图片'>
                         <PicturesWall ref={this.pw} imgs={imgs}/>
                     </Item>
-                    <Item label='商品详情'>
-                        <div>商品详情</div> 
+                    <Item label='商品详情' labelCol={{span: 2}} wrapperCol={{span: 20}}>
+                        <RichTextEditor ref={this.editor} detail={detail}/>
                     </Item>
                     <Item>
                         <Button type='primary' onClick={this.submit}>提交</Button>
