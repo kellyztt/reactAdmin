@@ -34,8 +34,8 @@ export default class Category extends Component{
                   //不能直接写两个标签，要在外面包一个根标签
                   <span>
                       <LinkButton onClick={() => this.showUpdate(category)}>修改分类</LinkButton>
-                      {/* 这样写函数在render的时候调用
-                    <LinkButton onClick={this.showSubCategorys()}>查看子分类</LinkButton> */}
+                      {/* 这样写函数在render的时候调用, 自执行函数
+                    <LinkButton onClick={this.showSubCategorys}>查看子分类</LinkButton> */}
                     {/**如何向事件回调函数传递参数：先定义一个匿名函数，再调用处理函数并传入数据 */}
                     {this.state.parentID === '0' ? <LinkButton onClick={() => this.showSubCategorys(category)} >查看子分类</LinkButton> : null}
                     
@@ -176,7 +176,7 @@ export default class Category extends Component{
         //标题
         const title= (parentID === '0') ? "一级分类列表" : (
         <span>
-            <LinkButton onClick={this.showCategorys()}>一级分类列表</LinkButton>
+            <LinkButton onClick={this.showCategorys}>一级分类列表</LinkButton>
             <Icon type="arrow-right" style={{marginRight: 5}}/>
             <span>{parentName}</span>
              

@@ -47,6 +47,8 @@ import { message } from 'antd';
   * 更新商品的状态（上架/下架）
   */
  export const reqUpdateStatus = (productId, status) => ajax(BASE + '/manage/product/updateStatus', {productId, status}, 'POST')
+
+ export const reqDeleteImg = (name) => ajax(BASE + '/manage/img/delete', {name}, 'POST');
  /**
   * jsonp请求的接口请求函数
   */
