@@ -12,9 +12,6 @@ import { message } from 'antd';
  //箭头有返回作用，不用写{return}
  export const reqLogin = (username, password) => ajax(BASE + '/login', { username, password }, 'POST');
 
- //add user 
- export const reqAddUser = (user) => ajax(BASE + '/manage/user/add', user, 'POST');
-
  //获取分类列表
  export const reqCategorys = (parentId) => ajax(BASE + '/manage/category/list', {parentId:parentId});
 
@@ -51,8 +48,25 @@ import { message } from 'antd';
  export const reqDeleteImg = (name) => ajax(BASE + '/manage/img/delete', {name}, 'POST');
 
  //添加或更新商品
- export const reqAddOrUpdateProduct = (product) => ajax(BASE + '/manage/product/' + product._id ? 'update' : 'add', product, 'POST');
+ export const reqAddOrUpdateProduct = (product) => ajax(BASE + '/manage/product/' + product._id ? 'update' : 'add', { product } , 'POST');
 
+ //获取所有角色列表
+ export const reqRoles = () => ajax(BASE + '/manage/role/list');
+
+ //添加角色
+ export const reqAddRole = (roleNmae) => ajax(BASE + '/mange/role/add', {roleNmae}, 'POST')
+
+ //更新角色
+ export const reqUpdateRole = (role) => ajax(BASE + '/manage/role/update', role, 'POST');
+
+ //获取用户
+ export const reqUsers = () => ajax(BASE + 'manage/user/list');
+
+ //删除用户
+ export const reqDeleteUser = (userId) => ajax(BASE + 'manage/user/delete', {userId}, 'POST');
+
+ //添加用户
+ export const reqAddOrUpdateUser = (user) => ajax(BASE + 'manage/user' + (user._id ? 'update' : '/add'), user, 'POST');
 
  /**
   * jsonp请求的接口请求函数

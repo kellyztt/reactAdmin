@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Form, Icon, Input, Cascader, Upload, Button } from 'antd';
+import { Card, Form, Icon, Input, Cascader, Upload, Button, message } from 'antd';
 import LinkButton from '../../components/link-button';
 import { reqCategorys, reqAddOrUpdateProduct } from '../../api';
 import PicturesWall from './pictures-wall';
@@ -56,11 +56,11 @@ class ProductAddUpdate extends Component{
                 product._id = this.product._id;
                 
             }
-            const result = await reqAddOrUpdateProduct(product)
+            const result = await reqAddOrUpdateProduct(product);
             //3. 更新提示
-            if (!err){
-                console.log('发送ajax请求');
-                
+            if (result.status === 0){
+                message.success(`${this.isUpdate ? '更新' : '添加'}商品成功`);
+                this.props.history.goBack();
             }
         })
     }

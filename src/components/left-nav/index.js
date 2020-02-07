@@ -3,10 +3,35 @@ import { Link, withRouter } from 'react-router-dom';
 import logo from '../../assets/images/logo.png';
 import { Menu, Icon } from 'antd';
 import menuList from '../../config/manuConfig';
+import memoryUtils from '../../utils/memoryUtils';
 import './index.less';
 
 const { SubMenu } = Menu;
 class LeftNav extends Component{
+    /**判断当前用户对item是否有权限 */
+    hasAuth = (item) => {
+        /**
+         * 1. 如果当前用户是admin，拥有全部权限
+         * 2. 当前item是公开的，所有用户都可以访问
+         * 3. 当前用户是否有权限key是否在menus中
+         */
+        const username = memoryUtils.user.user;
+        const { key, isPublic } = item;
+        const menus = memoryUtils.user.role.menus;
+        //找key在menu数组中的下标
+        if (username === 'admin' || isPublic || menus.indes
+        (key) !== -1){
+            return true;
+        } else if (item.children){
+            //当前用户有某个item的子item的权限
+            //find返回找到的对象
+            //!!强制将对象转换为boolean
+            return !!item.children.find((child) => menus.indexOf(child.key) !== -1)
+        }else {
+            return false;
+        }
+
+    }
     /**
      * 根据menu的数据数组生成对应标签数组
      * map+递归调用
@@ -36,21 +61,24 @@ class LeftNav extends Component{
         //reduce((上次统计结果，),初始值)
         const path = this.props.location.pathname;
         return menuList.reduce((pre, item) => {
-            //向pre中添加<Menu.Item>
-            if (!item.children){
-                pre.push((<Menu.Item key={item.key}><Link to={item.key}><Icon type={item.icon} /><span>{item.title}</span></Link></Menu.Item>));
-            } else {
+            if (this.hasAuth(item)){
+                //向pre中添加<Menu.Item>
+                if (!item.children){
+                    pre.push((<Menu.Item key={item.key}><Link to={item.key} ><Icon type={item.icon} /><span>{item.title}</span></Link></Menu.Item>));
+                } else {
                 //如果某个item的子item是当前选中的item
-                const cItem = item.children.find(cItem => path.indexOf(cItem.key)===0);
-                if (cItem){
-                    this.openKey = item.key;
-                }
-                pre.push((<SubMenu key={item.key} title={
+                    const cItem = item.children.find(cItem => path.indexOf(cItem.key)===0);
+                    if (cItem){
+                        this.openKey = item.key;
+                    }
+                    pre.push((<SubMenu key={item.key} title={
                     <span><Icon type={item.icon} /><span>{item.title}</span></span>
-                }>
-                    {this.getMenuNodes(item.children)}
-                </SubMenu>));
-            };
+                    }>
+                        {this.getMenuNodes(item.children)}
+                    </SubMenu>));
+                };
+            }
+            
             return pre; //当前统计结果，下一次统计的传入
         },[]);
     }
